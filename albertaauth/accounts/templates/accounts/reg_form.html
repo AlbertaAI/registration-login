@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% block body %}
+<div class="dashboard-content feature-style-5 text-dark">
+  <div class="dashboard-content-padding">
 <div class="container">
-  <h1>Register</h1>
+  <h1 class="section__heading text-center">Sign Up</h1>
+  <hr class="dark">
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button class="btn" type="submit">Submit</button>
+    <button class="btn blue-btn full-btn" type="submit">Submit</button>
   </form>
+</div>
+</div>
 </div>
 {% endblock %}

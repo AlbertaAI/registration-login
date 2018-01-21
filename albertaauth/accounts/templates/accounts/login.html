@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container">
-  <h1>Welcome</h1>
-  <p>
-    You can log in here!
-  </p>
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn" type="submit">Login</button>
-  </form>
+<div class="dashboard-content feature-style-5 text-dark">
+  <div class="dashboard-content-padding">
+    <div class="container">
+      <h2 class="section__heading text-center">Log In</h2>
+      <hr class="dark">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn blue-btn full-btn" type="submit">Login</button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
