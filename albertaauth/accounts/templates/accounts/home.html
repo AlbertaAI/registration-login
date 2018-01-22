@@ -96,6 +96,7 @@ $( document ).ready( handler ) {
     });
 
   });
+});
 
   function updateTextInput(val) {
       document.getElementById('textInput').value=val;
@@ -153,7 +154,6 @@ $( document ).ready( handler ) {
     const miniToken = MiniToken.at(address)
     listenForClicks(miniToken)
   }
-
   function listenForClicks (miniToken) {
     var value = $('#myRange').val();
     var button = document.querySelector('button.transferFunds')
