@@ -147,6 +147,7 @@ $( document ).ready( handler ) {
   }]
 
   const address = '0xdeadbeef123456789000000000000'
+
   function initContract (contract) {
     const MiniToken = contract(abi)
     const miniToken = MiniToken.at(address)
@@ -154,6 +155,7 @@ $( document ).ready( handler ) {
   }
 
   function listenForClicks (miniToken) {
+    var value = $('#myRange').val();
     var button = document.querySelector('button.transferFunds')
     button.addEventListener('click', function() {
       miniToken.transfer(toAddress, value, { from: addr })
