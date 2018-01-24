@@ -66,37 +66,38 @@ $( document ).ready( handler ) {
 
   token.totalSupply.call(function (err, totalSupply) {
 
-     // 2. get the number of decimal places used to represent this token
+    // 2. get the number of decimal places used to represent this token
 
-     token.decimals.call(function (err, decimals) {
+    token.decimals.call(function (err, decimals) {
+       // 3. get the name of the token
 
-         // 3. get the name of the token
+      token.name.call(function (err, name) {
 
-         token.name.call(function (err, name) {
+         // 3. get the balance of the account holder
 
-              // 3. get the balance of the account holder
+          var accountAddress = $('#accountAddress').text();
 
-              var accountAddress = $('#accountAddress').text();
+          token.balanceOf.call(accountAddress, function (err, balance) {
+            var percentOwned = balance.div(totalSupply).mul(100);
 
-              token.balanceOf.call(accountAddress, function (err, balance) {
-                var percentOwned = balance.div(totalSupply).mul(100);
+            var divisor = new web3.BigNumber(10).toPower(decimals);
+            totalSupply = totalSupply.div(divisor);
+            balance = balance.div(divisor);
 
-                var divisor = new web3.BigNumber(10).toPower(decimals);
-                totalSupply = totalSupply.div(divisor);
-                balance = balance.div(divisor);
-
-                var results = '<b>Token:</b> ' + name + '<br />';
-                results += '<b>Total supply:</b> ' + totalSupply.round(5) + '<br /><br />';
-                results += accountAddress + ' owns ' + balance.round(5) + ' which is ' + percentOwned.round(5) + '% of the total supply';
-                var balance = balance.round(5);
-                $('#balance').html(balance);
-              });
+            var results = '<b>Token:</b> ' + name + '<br />';
+            results += '<b>Total supply:</b> ' + totalSupply.round(5) + '<br /><br />';
+            results += accountAddress + ' owns ' + balance.round(5) + ' which is ' + percentOwned.round(5) + '% of the total supply';
+            var balance = balance.round(5);
+            $('#balance').html(balance);
           });
+        });
+
+      });
 
     });
-
-  });
 });
+</script>
+<script>
 
   function updateTextInput(val) {
       document.getElementById('textInput').value=val;
@@ -183,4 +184,143 @@ $( document ).ready( handler ) {
 
 });
 </script>
+<!-- <script>
+  // create a web3 object connected to our NodETH node
+  var web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/TOKEN"));
+
+  // define the ERC20 standard token ABI to interact with token contracts using
+  var erc20Abi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"type":"function"}];
+
+
+  $( document ).ready( handler ) {
+    // preventDefault on the submit event to prevent form from carrying out its default action
+
+    event.preventDefault();
+    // set our results div to show a loading status
+    //$('#results').html('loading...');
+
+    // query the blockchain and update #results
+    var tokenAddress = $('#contractAddress').val();
+    var token = web3.eth.contract(erc20Abi).at(tokenAddress);
+
+    // 1. get the total supply
+
+    token.totalSupply.call(function (err, totalSupply) {
+
+      // 2. get the number of decimal places used to represent this token
+
+      token.decimals.call(function (err, decimals) {
+         // 3. get the name of the token
+
+        token.name.call(function (err, name) {
+
+           // 3. get the balance of the account holder
+
+            var accountAddress = $('#accountAddress').text();
+
+            token.balanceOf.call(accountAddress, function (err, balance) {
+              var percentOwned = balance.div(totalSupply).mul(100);
+
+              var divisor = new web3.BigNumber(10).toPower(decimals);
+              totalSupply = totalSupply.div(divisor);
+              balance = balance.div(divisor);
+
+              var results = '<b>Token:</b> ' + name + '<br />';
+              results += '<b>Total supply:</b> ' + totalSupply.round(5) + '<br /><br />';
+              results += accountAddress + ' owns ' + balance.round(5) + ' which is ' + percentOwned.round(5) + '% of the total supply';
+              var balance = balance.round(5);
+              $('#balance').html(balance);
+            });
+          });
+
+        });
+
+      });
+  });
+
+  function updateTextInput(val) {
+      document.getElementById('textInput').value=val;
+  }
+
+  window.addEventListener('load', function() {
+
+    // Check if Web3 has been injected by the browser:
+    if (typeof web3 !== 'undefined') {
+      // You have a web3 browser! Continue below!
+      startApp(web3);
+    } else {
+       // Warn the user that they need to get a web3 browser
+       // Or install MetaMask, maybe with a nice graphic.
+    }
+
+  })
+
+  const Eth = require('ethjs-query')
+  const EthContract = require('ethjs-contract')
+
+  function startApp(web3) {
+    const eth = new Eth(web3.currentProvider)
+    const contract = new EthContract(eth)
+    initContract(contract)
+  }
+
+  const abi = [{
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "type": "function"
+  }]
+
+  const address = '0xdeadbeef123456789000000000000'
+
+  function initContract (contract) {
+    const MiniToken = contract(abi)
+    const miniToken = MiniToken.at(address)
+    listenForClicks(miniToken)
+  }
+  function listenForClicks (miniToken) {
+    var value = $('#myRange').val();
+    var button = document.querySelector('button.transferFunds')
+    button.addEventListener('click', function() {
+      miniToken.transfer(toAddress, value, { from: addr })
+      .then(function (txHash) {
+        console.log('Transaction sent')
+        console.dir(txHash)
+        waitForTxToBeMined(txHash)
+      })
+      .catch(console.error)
+    })
+  }
+
+  var inWei = web3.toWei('10', 'ether')
+  async function waitForTxToBeMined (txHash) {
+    let txReceipt
+    while (!txReceipt) {
+      try {
+        txReceipt = await eth.getTransactionReceipt(txHash)
+      } catch (err) {
+        return indicateFailure(err)
+      }
+    }
+    indicateSuccess()
+  }
+
+});
+</script> -->
 {% endblock %}
